@@ -1,108 +1,269 @@
+// ======================================================
+// JOGO DA GALINHA - SCRIPT PRINCIPAL
+// ======================================================
+// Regras do jogo:
+//
+// 🐣 (pintinho) -> 1 clique -> 🐓 (galo)
+// 🐓 (galo)     -> 1 clique -> 🍗 (frango)
+// 🍗 (frango)   -> 1 clique -> 🦴 (osso)
+//
+// Características:
+// - Tela inteira
+// - Bichos se movem livremente pela tela
+// - Passam por trás do HUD (títulos e galinha)
+// - Botão direito funciona igual ao esquerdo
+// - Menu do botão direito é desativado
+// ======================================================
+
+
+// Aguarda o HTML terminar de carregar antes de executar o código
 document.addEventListener("DOMContentLoaded", () => {
-  const chicken = document.getElementById("chicken");
-  const mundo = document.getElementById("mundo");
-  const scoreDisplay = document.getElementById("score");
 
+  // Captura o elemento da galinha no HTML
+  const chicken = document.getElementById("chicken")
+
+  // Captura o container onde os animais irão se mover
+  const mundo = document.getElementById("mundo")
+
+  // Captura o contador exibido na tela
+  const scoreDisplay = document.getElementById("score")
+
+  // Verificação de segurança caso algum ID não exista
   if (!chicken || !mundo || !scoreDisplay) {
-    alert("IDs faltando no HTML: chicken, mundo, score.");
-    return;
+
+    // Mostra erro para o usuário
+    alert("IDs faltando no HTML: chicken, mundo, score.")
+
+    // Interrompe execução do script
+    return
   }
 
-  // bloqueia menu do botão direito
-  document.addEventListener("contextmenu", (e) => e.preventDefault());
 
-  let score = 0;
+  // =========================================
+  // BLOQUEAR MENU DO BOTÃO DIREITO
+  // =========================================
 
-  function clamp(v, min, max) {
-    return Math.max(min, Math.min(max, v));
-  }
+  // Quando o menu de contexto tentar abrir
+  document.addEventListener("contextmenu", (e) => {
 
-  function criarPintinho() {
-    score++;
-    scoreDisplay.textContent = score;
+    // Cancela o comportamento padrão do navegador
+    e.preventDefault()
 
-    const animal = document.createElement("div");
-    animal.className = "pinto";
-    animal.textContent = "🐣";
-    animal.style.position = "absolute";
+  })
 
-    // adiciona no mundo (tela toda)
-    mundo.appendChild(animal);
 
-    const size = 40;
+  // =========================================
+  // CONTADOR DE ANIMAIS CRIADOS
+  // =========================================
 
-    // posição inicial aleatória pela tela inteira
-    let W = window.innerWidth;
-    let H = window.innerHeight;
+  // Variável que armazena o total de pintinhos criados
+  let score = 0
 
-    let x = Math.random() * (W - size);
-    let y = Math.random() * (H - size);
 
-    animal.style.left = x + "px";
-    animal.style.top = y + "px";
+  // =========================================
+  // FUNÇÃO AUXILIAR PARA LIMITAR VALORES
+  // =========================================
 
-    // velocidade inicial
-    let dx = (Math.random() * 2 - 1) * 6;
-    let dy = (Math.random() * 2 - 1) * 6;
-    if (Math.abs(dx) < 1) dx = 2;
-    if (Math.abs(dy) < 1) dy = -2;
+  // Mantém um valor sempre entre mínimo e máximo
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v))
 
-    // evolução
-    let estado = "pinto";
-    let clicks = 0;
 
-    // clique com qualquer botão
-    animal.addEventListener("mousedown", (e) => {
-      e.stopPropagation();
-      clicks++;
+  // =========================================
+  // FUNÇÃO PRINCIPAL QUE CRIA UM PINTINHO
+  // =========================================
 
-      if (estado === "pinto" && clicks >= 3) {
-        animal.textContent = "🐓";
-        animal.className = "galo";
-        estado = "galo";
-        clicks = 0;
-        return;
+  function criarAnimal(){
+
+    // Incrementa o contador
+    score++
+
+    // Atualiza o número na interface
+    scoreDisplay.textContent = score
+
+
+    // Cria um novo elemento HTML (div)
+    const animal = document.createElement("div")
+
+    // Define a classe inicial do animal
+    animal.className = "pinto"
+
+    // Define o emoji inicial
+    animal.textContent = "🐣"
+
+    // Define posicionamento absoluto para permitir movimentação livre
+    animal.style.position = "absolute"
+
+    // Adiciona o animal ao "mundo" (tela inteira)
+    mundo.appendChild(animal)
+
+
+    // =========================================
+    // DEFINIÇÕES DE TAMANHO E POSIÇÃO
+    // =========================================
+
+    // Tamanho aproximado do animal em pixels
+    const size = 40
+
+    // Largura da janela do navegador
+    let W = window.innerWidth
+
+    // Altura da janela do navegador
+    let H = window.innerHeight
+
+    // Posição inicial aleatória no eixo X
+    let x = Math.random() * (W - size)
+
+    // Posição inicial aleatória no eixo Y
+    let y = Math.random() * (H - size)
+
+    // Aplica posição no elemento
+    animal.style.left = x + "px"
+    animal.style.top = y + "px"
+
+
+    // =========================================
+    // VELOCIDADE INICIAL
+    // =========================================
+
+    // Velocidade horizontal aleatória
+    let dx = (Math.random()*2-1)*6
+
+    // Velocidade vertical aleatória
+    let dy = (Math.random()*2-1)*6
+
+    // Garante que não fique quase parado
+    if(Math.abs(dx) < 1) dx = 2
+    if(Math.abs(dy) < 1) dy = -2
+
+
+    // =========================================
+    // ESTADO ATUAL DO ANIMAL
+    // =========================================
+
+    // Estados possíveis:
+    // pinto -> galo -> frango -> osso
+    let estado = "pinto"
+
+
+    // =========================================
+    // CLIQUE NO ANIMAL
+    // =========================================
+
+    animal.addEventListener("mousedown",(e)=>{
+
+      // Impede o clique de atingir outros elementos
+      e.stopPropagation()
+
+
+      // EVOLUÇÃO DO PINTINHO
+      if(estado === "pinto"){
+
+        // Troca emoji
+        animal.textContent = "🐓"
+
+        // Atualiza classe
+        animal.className = "galo"
+
+        // Atualiza estado
+        estado = "galo"
+
+        return
       }
 
-      if (estado === "galo" && clicks >= 5) {
-        animal.textContent = "🍗";
-        animal.className = "frango";
-        estado = "frango";
-        return;
+
+      // EVOLUÇÃO DO GALO
+      if(estado === "galo"){
+
+        animal.textContent = "🍗"
+        animal.className = "frango"
+        estado = "frango"
+
+        return
       }
-    });
 
-    // movimento livre pela tela toda, passando atrás do HUD
-    const tick = setInterval(() => {
-      W = window.innerWidth;
-      H = window.innerHeight;
 
-      // aleatoriedade suave na direção
-      dx += (Math.random() * 2 - 1) * 0.8;
-      dy += (Math.random() * 2 - 1) * 0.8;
+      // EVOLUÇÃO DO FRANGO
+      if(estado === "frango"){
 
-      // limita velocidade
-      const vmax = 10;
-      dx = clamp(dx, -vmax, vmax);
-      dy = clamp(dy, -vmax, vmax);
+        animal.textContent = "🦴"
+        animal.className = "osso"
+        estado = "osso"
 
-      x += dx;
-      y += dy;
+        return
+      }
 
-      // quica nas bordas da tela
-      if (x <= 0) { x = 0; dx *= -1; }
-      if (y <= 0) { y = 0; dy *= -1; }
-      if (x >= W - size) { x = W - size; dx *= -1; }
-      if (y >= H - size) { y = H - size; dy *= -1; }
+      // O osso é o estágio final
 
-      animal.style.left = x + "px";
-      animal.style.top = y + "px";
-    }, 60);
+    })
 
-    // opcional: remover depois de 90s (se quiser infinito, remova isso)
-    // setTimeout(() => { clearInterval(tick); animal.remove(); }, 90000);
+
+    // =========================================
+    // MOVIMENTO CONTÍNUO DOS ANIMAIS
+    // =========================================
+
+    const tick = setInterval(()=>{
+
+      // Atualiza tamanho da janela caso o usuário redimensione
+      W = window.innerWidth
+      H = window.innerHeight
+
+
+      // Adiciona pequena aleatoriedade na direção
+      dx += (Math.random()*2-1)*0.8
+      dy += (Math.random()*2-1)*0.8
+
+
+      // Limita velocidade máxima
+      const vmax = 10
+
+      dx = clamp(dx,-vmax,vmax)
+      dy = clamp(dy,-vmax,vmax)
+
+
+      // Atualiza posição
+      x += dx
+      y += dy
+
+
+      // Colisão com borda esquerda
+      if(x <= 0){
+        x = 0
+        dx *= -1
+      }
+
+      // Colisão com topo
+      if(y <= 0){
+        y = 0
+        dy *= -1
+      }
+
+      // Colisão com borda direita
+      if(x >= W-size){
+        x = W-size
+        dx *= -1
+      }
+
+      // Colisão com parte inferior
+      if(y >= H-size){
+        y = H-size
+        dy *= -1
+      }
+
+
+      // Atualiza posição visual do animal
+      animal.style.left = x + "px"
+      animal.style.top = y + "px"
+
+    },60)
+
   }
 
-  // galinha cria pintinho com qualquer botão do mouse
-  chicken.addEventListener("mousedown", criarPintinho);
-});
+
+  // =========================================
+  // CLIQUE NA GALINHA CRIA UM PINTINHO
+  // =========================================
+
+  // mousedown permite usar qualquer botão do mouse
+  chicken.addEventListener("mousedown", criarAnimal)
+
+})
