@@ -1,0 +1,91 @@
+/* ============================= */
+/* TELA CHEIA - SEM SCROLL */
+/* ============================= */
+html, body{
+  width:100%;
+  height:100%;
+  margin:0;
+  overflow:hidden; /* tira scroll vertical e horizontal */
+  font-family: Arial, Helvetica, sans-serif;
+
+  user-select:none;
+  -webkit-user-select:none;
+  -ms-user-select:none;
+}
+
+/* remove highlight azul no mobile */
+*{
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================= */
+/* FUNDO */
+/* ============================= */
+body{
+  background: linear-gradient(135deg,#ffe08a,#ffb347);
+}
+
+/* ============================= */
+/* MUNDO (ATRÁS) - ONDE OS BICHOS ANDAM */
+/* ============================= */
+#mundo{
+  position:fixed;
+  inset:0;          /* top:0 right:0 bottom:0 left:0 */
+  width:100vw;
+  height:100vh;
+  z-index:1;
+  pointer-events:none; /* cliques passam pro HUD, MAS bichos vão receber por JS */
+}
+
+/* ============================= */
+/* HUD (FRENTE) - TITULOS + GALINHA */
+/* ============================= */
+#hud{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  z-index:10;
+  text-align:center;
+  padding-top:14px;
+  pointer-events:none; /* HUD não bloqueia o mundo */
+}
+
+#hud h1{
+  margin:0;
+  font-size:34px;
+}
+
+#hud p{
+  margin:8px 0 10px 0;
+}
+
+/* contador */
+.contador{
+  font-size:20px;
+  margin-bottom:10px;
+}
+
+/* galinha clicável, mas precisa permitir clique */
+#chicken{
+  font-size:120px;
+  display:inline-block;
+  cursor:pointer;
+  transition: transform 0.1s;
+  pointer-events:auto; /* permite clicar na galinha */
+}
+
+#chicken:active{
+  transform: scale(0.92);
+}
+
+/* ============================= */
+/* BICHOS (ATRÁS DO HUD) */
+/* ============================= */
+.pinto, .galo, .frango{
+  position:absolute;
+  font-size:40px;
+  cursor:pointer;
+  z-index:2;          /* acima do fundo, abaixo do HUD */
+  pointer-events:auto; /* permite clicar neles */
+}
